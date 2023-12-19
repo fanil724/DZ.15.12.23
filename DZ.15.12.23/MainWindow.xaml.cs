@@ -40,42 +40,32 @@ namespace DZ._15._12._23
 
         private void task2_Click(object sender, RoutedEventArgs e)
         {
-            int count = 0;
-            int pos = 0;
-            ints.AsParallel().AsOrdered().ForAll((x) =>
+            List<string> str = new List<string>();
+            Enumerable.Range(0, ints.Count).AsParallel().ForAll(x =>
            {
-               int cnt = 0;
-               int p = 0;
+
+               List<string> s = new List<string>();
                var res = ints.Skip(x).ToList();
-               for (int i = 0; i < res.Count() - 1; i++)
+
+               for (int i = 1; i < res.Count - 1; i++)
                {
-                   if (res[i] < res[i + 1])
+                   if (i == 1) s.Add(res[i - 1].ToString());
+
+                   if (res[i - 1] < res[i])
                    {
-                       cnt++;
-                       if (cnt == 1) p = i;
+                       s.Add(res[i].ToString());
                    }
                    else
                    {
-                       if (count < cnt)
-                       {
-                           count = cnt;
-                           pos = p;
-                       }
-
-                       cnt = 0;
-
+                       i = res.Count;
                    }
                }
-
+               str.Add(string.Join(" ", s));
            });
+            Thread.Sleep(1000);
+            string s1 = str.OrderByDescending(x => x.Count()).First();
 
-            string s = "";
-            for (int i = pos; i < count; i++)
-            {
-                s += $" {ints[i]}";
-            }
-            result.Items.Add($"Самая длинная возрастающая последовательность: {s} количесвто элементов {count} ");
-
+            result.Items.Add($"Самая длинная возрастающая последовательность: {s1} ");
         }
 
         private void task3_Click(object sender, RoutedEventArgs e)
@@ -83,17 +73,16 @@ namespace DZ._15._12._23
 
             List<string> strings = new List<string>();
 
-            ints.AsParallel().AsOrdered().ForAll((x) =>
-             {
-                 strings.Add(string.Join(" ", ints.Skip(x).TakeWhile((y) => y > 0)));
-             });
+            // Parallel.For(0, ints.Count, x => strings.Add(string.Join(" ", ints.Skip(x).TakeWhile((y) => y > 0))));
+
+            Enumerable.Range(0, ints.Count).AsParallel().ForAll(x => strings.Add(string.Join(" ", ints.Skip(x).TakeWhile((y) => y > 0))));
 
             var s = strings.OrderByDescending(x => x.Length).FirstOrDefault();
 
-            //foreach (string s2 in strings)
-            //{
-            //    result.Items.Add(s2);
-            //}
+            foreach (string s2 in strings)
+            {
+                result.Items.Add(s2);
+            }
             result.Items.Add($"Самая длинная положительная последовательность: {s} ");
 
         }

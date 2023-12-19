@@ -12,18 +12,14 @@ namespace Task3
             InitializeComponent();
             alls.IsChecked = true;
             max.IsChecked = true;
-            string[] files = Directory.GetFiles("Resume");
+            List<string> files = Directory.GetFiles("Resume").ToList();
+          //  MessageBox.Show(files.Count().ToString(), "Info", MessageBoxButton.OK);
+
+            Task t = Task.Run(() => { Parallel.ForEach(files, Readon); });
+            t.Wait();
 
 
-            files.AsParallel().ForAll(f =>
-            {
-                using (StreamReader str = new StreamReader(f))
-                {
-                    resumes.Add(new Resume(str.ReadToEnd()));
-                }
-            });
-
-            Thread.Sleep(25000);
+         //   MessageBox.Show(resumes.Count().ToString(), "Info", MessageBoxButton.OK);
 
         }
 
@@ -36,8 +32,8 @@ namespace Task3
 
             if (min.IsChecked == true)
                 res = resumes.AsParallel().OrderBy(x => x.Salary).ToList();
-            Thread.Sleep(10000);
 
+            //  Thread.Sleep(10000);
             if (ones.IsChecked == true)
                 otchet.Items.Add(res.First());
 
@@ -66,9 +62,9 @@ namespace Task3
             otchet.Items.Clear();
             List<Resume> res = new List<Resume>();
 
-            res = resumes.Where(x => x.City == nameCity.Text).ToList();
+            res = resumes.AsParallel().Where(x => x.City == nameCity.Text).ToList();
 
-            Thread.Sleep(10000);
+            //   Thread.Sleep(10000);
 
             foreach (var s in res)
                 otchet.Items.Add(s);
@@ -85,7 +81,7 @@ namespace Task3
 
             if (min.IsChecked == true)
                 res = resumes.AsParallel().OrderBy(x => x.Experience).ToList();
-            Thread.Sleep(10000);
+            //  Thread.Sleep(10000);
 
             if (ones.IsChecked == true)
                 otchet.Items.Add(res.First());
@@ -129,6 +125,15 @@ namespace Task3
         private void min_Checked(object sender, RoutedEventArgs e)
         {
             max.IsChecked = false;
+        }
+
+        private  void Readon(string f)
+        {
+            using (StreamReader str = new StreamReader(f))
+            {
+                resumes.Add(new Resume(str.ReadToEnd()));
+            }
+
         }
     }
 }
